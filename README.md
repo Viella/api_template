@@ -6,6 +6,8 @@
 - **Uvicorn**（将来的に **Gunicorn** + UvicornWorker へ拡張可能）
 - **Dockerfile** によるコンテナ化
 - **src レイアウト**
+- **CI**（Ruff で Lint、Docker イメージのビルド）
+- **docker-compose**（開発用の簡易起動）
 
 ### ディレクトリ構成
 
@@ -13,7 +15,11 @@
 .
 ├── .dockerignore
 ├── .gitignore
+├── .github
+│   └── workflows
+│       └── ci.yml
 ├── Dockerfile
+├── docker-compose.yml
 ├── README.md
 ├── pyproject.toml
 └── src
@@ -75,6 +81,22 @@ docker run --rm -p 8000:8000 api-template
 ```bash
 uv run --no-sync uvicorn --app-dir src app.main:app --host 0.0.0.0 --port 8000
 ```
+
+---
+
+### Docker Compose（開発用）
+
+ホットリロード付きで起動（`src` をマウントし、`--reload` で監視）。
+
+```bash
+# Build + Run
+docker compose up --build
+
+# 停止
+docker compose down
+```
+
+ブラウザ: `http://127.0.0.1:8000`
 
 ---
 
