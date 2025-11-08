@@ -23,6 +23,12 @@ jobs:
           uvx ruff --version
           uvx ruff check .
 
+      - name: Setup project env (tests)
+        run: uv sync --group test
+
+      - name: Test (pytest)
+        run: PYTHONPATH=src uv run pytest -q
+
       - name: Build Docker image
         run: docker build -t api-template:ci .
 
