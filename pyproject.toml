@@ -16,9 +16,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/app"]
 
-[tool.uv.dependency-groups]
+[dependency-groups]
 dev = [
-    "pytest",
-    "httpx",
+    "pytest >=8.2.0",
+    "httpx >=0.27.0"
 ]
 
