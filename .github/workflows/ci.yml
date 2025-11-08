@@ -26,4 +26,28 @@ jobs:
       - name: Build Docker image
         run: docker build -t api-template:ci .
 
+      - name: Run container
+        run: docker run -d --name api-template -p 8000:8000 api-template:ci
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8000/health > /dev/null; then
+              echo "App is up"
+              break
+            fi
+            sleep 1
+          done
+          # Verify endpoints
+          curl -fsS http://127.0.0.1:8000/health
+          curl -fsS http://127.0.0.1:8000/
+
+      - name: Cleanup container
+        if: always()
+        run: |
+          docker logs api-template || true
+          docker rm -f api-template || true
+
 
