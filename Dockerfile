@@ -13,8 +13,8 @@ WORKDIR /app
 COPY pyproject.toml README.md uv.lock* /app/
 
 #--forozenは依存関係を固定　（uv.lockを使用)　--no-devはdev依存関係をインストールしない
-# --no-devは古い書き方なので、 --no-group devに　（tool.uv.dependency-groupsで定義したdevグループを使用）
-RUN uv sync --frozen --group dev
+# --no-devは古い書き方なので、 --group devに
+RUN uv sync --frozen --no-group dev
 
 # アプリ本体
 COPY src /app/src

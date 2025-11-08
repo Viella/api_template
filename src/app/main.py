@@ -18,9 +18,9 @@ def health() -> dict[str, str]:
 
 # tags: グループ化されたAPIを表示するためのグループ名 OpenAPI用
 @app.post("/posting_api",tags=["posting_api"])
-def posting_test(string:str):
+def posting_test():
     return {"message": "Oh yeah"}
 
 @app.post("/posting_api/2",tags=["posting_api"])
-def posting_test_2(string:str):
+def posting_test_2():
     return {"message": "Oh"}
