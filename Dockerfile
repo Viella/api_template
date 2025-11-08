@@ -1,29 +1,40 @@
+# uv は環境構築だけにする（マルチステージビルド）
+#　最終のステージだけがイメージに残る
+# builder
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm AS builder
+#astralのuvのPythonイメージを使用   
+#公式のスリムpythonイメージでもおk
+
+# コンテナの 作業ディレクトリを設定
+WORKDIR /app
+
+# 依存のみ先にコピー（ビルドキャッシュ最適化）
+# README.md忘れがち(hatchlingが、ビルド時にPyprojectの実際のファイルの存在チェックするので必要)
+COPY pyproject.toml README.md uv.lock* /app/
+
+#--forozenは依存関係を固定　（uv.lockを使用)　--no-devはdev依存関係をインストールしない
+RUN uv sync --frozen --no-dev
+
+# アプリ本体
+COPY src /app/src
+
+# runtime
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    UV_SYSTEM_PYTHON=1 \
-    UV_LINK_MODE=copy
-
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && mv /root/.local/bin/uv /usr/local/bin/uv
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Copy dependency definitions first for better build caching
-COPY pyproject.toml /app/
+# builderステージのイメージからvenvをコピー
+COPY --from=builder /app/.venv /app/.venv
 
-# Install dependencies into a local virtualenv
-RUN uv sync --no-dev
+COPY --from=builder /app/src /app/src
 
-# Copy application source
-COPY src /app/src
+ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
+CMD ["uvicorn", "--app-dir", "src", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-# Use uv to run without syncing again (deps are already installed)
-CMD ["uv", "run", "--no-sync", "uvicorn", "--app-dir", "src", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-
+# 最終的にbuilderステージは消えるから軽量　やったね
+# マルチステージビルドにしない場合 1.5GBくらいになった　->この構成だと約250MB
