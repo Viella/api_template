@@ -24,7 +24,7 @@ jobs:
           uvx ruff check .
 
       - name: Setup project env (tests)
-        run: uv sync --frozen
+        run: uv sync --frozen --group dev
 
       - name: Test (pytest)
         run: PYTHONPATH=src uv run pytest -q
