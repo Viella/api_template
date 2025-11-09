@@ -115,5 +115,4 @@ Docker 化する場合は、`Dockerfile` に `gunicorn` を追加インストー
 ### メモ
 - パッケージ管理は **uv**（`pyproject.toml`）で行います。ロックファイルを使いたい場合は `uv lock` を実行してください。
 - src レイアウトのため、開発中は `--app-dir src`（または `PYTHONPATH=src`）を指定してモジュールを解決しています。
-
-
+- Uvicorn: ASGI Server, FastAPI: ASGI Application (Starlette)
